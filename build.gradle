@@ -1,0 +1,48 @@
+group 'com.lamdapossanda'
+
+apply plugin: 'groovy'
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile(
+            'org.codehaus.groovy:groovy-all:2.4.7',
+            'com.amazonaws:aws-lambda-java-core:1.1.0',
+            'com.amazonaws:aws-lambda-java-log4j:1.0.0',
+            'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.8.8',
+            'com.google.guava:guava:23.0'
+    )
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.232'
+    compile group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.1.0'
+    compile group: 'org.codehaus.groovy', name: 'groovy-json', version: '2.4.12'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-csv', version: '2.9.2'
+
+}
+
+// Task for building the zip file for upload
+task buildZip(type: Zip) {
+    // Using the Zip API from gradle to build a zip file of all the dependencies
+    //
+    // The path to this zip file can be set in the serverless.yml file for the
+    // package/artifact setting for deployment to the S3 bucket
+    //
+    // Link: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html
+
+    // set the base name of the zip file
+    baseName = "hello"
+    from compileGroovy
+    from processResources
+    into('lib') {
+        from configurations.runtime
+    }
+}
+
+build.dependsOn buildZip
